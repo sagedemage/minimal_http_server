@@ -99,10 +99,8 @@ int main() {
 			return -1;
 		}
 		else {
-			std::cout << "Sent message to client \n" << std::endl;
+			std::cout << "Sent http request to the client \n" << std::endl;
 		}
-
-		std::cout << "Buffer: " << (char*)buf << std::endl;
 
 		// close the socket
 		close(new_socket);
