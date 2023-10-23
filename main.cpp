@@ -66,7 +66,7 @@ int main() {
 
 	if (!HtmlFile) {
 		std::cout << "Error: Can't read file" << std::endl;
-
+		return -1;
 	}
 
 	// get length of file:
