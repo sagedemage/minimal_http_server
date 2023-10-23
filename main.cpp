@@ -24,12 +24,9 @@ int main() {
 	int server_fd, new_socket;
 	struct sockaddr_in address;
 	int opt = 1;
-	//ssize_t read_status;
 	ssize_t send_status;
 	socklen_t addrlen = sizeof(address);
-	//int buf[1024] = { 0 };
 
-	//char* msg = (char*)"HTTP/1.1 200 OK\n\nHello World";
 	std::string response = "HTTP/1.1 200 OK\n\n";
 
 	// Setup address
@@ -90,9 +87,7 @@ int main() {
 			exit(EXIT_FAILURE);
 		}
 
-		// Read the buffer
-		//read_status = read(new_socket, buf, 1024);
-
+		// Store html char pointer data
 		std::string temp = response + (std::string)buf;
 		const char* html = temp.c_str();
 
