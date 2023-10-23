@@ -87,7 +87,7 @@ int main() {
 			exit(EXIT_FAILURE);
 		}
 
-		// Store html char pointer data
+		// Store HTML char pointer data
 		std::string temp = response + (std::string)buf;
 		const char* html = temp.c_str();
 
