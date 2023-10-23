@@ -96,6 +96,7 @@ int main() {
 		std::string temp = response + (std::string)buf;
 		const char* html = temp.c_str();
 
+		// Send the buffer of html web page
 		send_status = send(new_socket, html, strlen(html), 0);
 
 		if (send_status == -1) {
