@@ -20,6 +20,29 @@ static struct sockaddr_in setup_address() {
 	return address;
 }
 
+char* read_html_file(std::string html_file_path) {
+	/* read html file */
+	std::ifstream HtmlFile(html_file_path, std::ifstream::binary);
+
+	if (!HtmlFile) {
+		std::cout << "Error: Can't read file" << std::endl;
+		exit (EXIT_FAILURE);
+	}
+
+	// get length of file:
+	HtmlFile.seekg (0, HtmlFile.end);
+	int length = HtmlFile.tellg();
+	HtmlFile.seekg (0, HtmlFile.beg);
+
+	char* buf = new char [length];
+	HtmlFile.read(buf, length);
+
+	// close file
+	HtmlFile.close();
+
+	return buf;
+}
+
 int main() {
 	int server_fd, new_socket;
 	struct sockaddr_in address;
@@ -62,21 +85,6 @@ int main() {
 	std::cout << msg1 << std::endl;
 	std::cout << msg2 << std::endl;
 
-	std::ifstream HtmlFile("index.html", std::ifstream::binary);
-
-	if (!HtmlFile) {
-		std::cout << "Error: Can't read file" << std::endl;
-		return -1;
-	}
-
-	// get length of file:
-	HtmlFile.seekg (0, HtmlFile.end);
-	int length = HtmlFile.tellg();
-	HtmlFile.seekg (0, HtmlFile.beg);
-
-	char* buf = new char [length];
-	HtmlFile.read(buf, length);
-
 	while (true) {
 		// Accept for connections
 		new_socket = accept(server_fd, (struct sockaddr *)&address, &addrlen);
@@ -85,6 +93,50 @@ int main() {
 
 			perror("accept");
 			exit(EXIT_FAILURE);
+		}
+
+		int buf2[1024] = { 0 };
+
+		// Read buffer of request
+		ssize_t read_status = read(new_socket, buf2, 1024);
+
+		char* temp2 = (char*)buf2;
+
+		std::string temp3 = (std::string)temp2;
+
+		char temp4[1024] = { 0 };
+
+		for (long unsigned int i = 0; i < temp3.length(); i++) {
+			temp4[i] = temp3[i];
+		}
+
+		char *line = strtok(temp4, "\n");
+
+		std::string request = "";
+
+		while (line != NULL) {
+			request = (std::string)line;
+			line = strtok(NULL, "\n");
+			break;
+		}
+
+		char* buf = (char*)"";
+
+		std::cout << request.compare("GET / HTTP/1.1") << std::endl;
+
+		if (request.compare("GET / HTTP/1.1") == 1) {
+			buf = read_html_file("static/index.html");
+		}
+		else if (request.compare("GET /about HTTP/1.1") == 1) {
+			buf = read_html_file("static/about/index.html");
+		}
+
+		if (read_status == -1) {
+			std::cout << "Reading the message failed \n" << std::endl;
+			return -1;
+		}
+		else {
+			std::cout << (char*)buf2 << std::endl;
 		}
 
 		// Store HTML char pointer data
@@ -105,6 +157,4 @@ int main() {
 		// close the socket
 		close(new_socket);
 	}
-	// close file
-	HtmlFile.close();
 }
