@@ -100,6 +100,11 @@ int main() {
 		// Read buffer of request
 		ssize_t read_status = read(new_socket, buf2, 1024);
 
+		if (read_status == -1) {
+			std::cout << "Reading the message failed \n" << std::endl;
+			return -1;
+		}
+
 		char* temp2 = (char*)buf2;
 
 		std::string temp3 = (std::string)temp2;
@@ -122,21 +127,11 @@ int main() {
 
 		char* buf = (char*)"";
 
-		std::cout << request.compare("GET / HTTP/1.1") << std::endl;
-
 		if (request.compare("GET / HTTP/1.1") == 1) {
 			buf = read_html_file("static/index.html");
 		}
 		else if (request.compare("GET /about HTTP/1.1") == 1) {
 			buf = read_html_file("static/about/index.html");
-		}
-
-		if (read_status == -1) {
-			std::cout << "Reading the message failed \n" << std::endl;
-			return -1;
-		}
-		else {
-			std::cout << (char*)buf2 << std::endl;
 		}
 
 		// Store HTML char pointer data
@@ -151,7 +146,7 @@ int main() {
 			return -1;
 		}
 		else {
-			std::cout << "Sent http request to the client \n" << std::endl;
+			std::cout << (char*)buf2 << std::endl;
 		}
 
 		// close the socket
