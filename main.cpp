@@ -16,137 +16,137 @@ namespace fs = std::filesystem;
 #define PORT 8000
 
 static struct sockaddr_in setup_address() {
-    /* Setup Address */
-    struct sockaddr_in address;
-    address.sin_family = AF_INET;
-    address.sin_addr.s_addr = INADDR_ANY;
-    address.sin_port = htons(PORT);
-    return address;
+	/* Setup Address */
+	struct sockaddr_in address;
+	address.sin_family = AF_INET;
+	address.sin_addr.s_addr = INADDR_ANY;
+	address.sin_port = htons(PORT);
+	return address;
 }
 
 std::string find_requested_html_file(std::string file_route) {
 	/* Recursively look through the directory to find the requested html file */
 	std::string file_name = "static/404.html";
-    std::string path_route = "static";
-    for (const auto & entry : fs::directory_iterator(path_route)) {
-        fs::path path(entry);
-        std::error_code ec;
+	std::string path_route = "static";
+	for (const auto & entry : fs::directory_iterator(path_route)) {
+		fs::path path(entry);
+		std::error_code ec;
 		std::string path_string = path.string();
 		if (file_route.compare(path_string)) {
 			file_name = file_route;
 			return file_name;
 		}
-        if (fs::is_directory(path, ec)) {
+		if (fs::is_directory(path, ec)) {
 			file_name = find_requested_html_file(file_route);
-        }
-    }
-    return file_name;
+		}
+	}
+	return file_name;
 }
 
 char* read_html_file(std::string html_file_path) {
-    /* Read html file and returns its buffer */
-    std::ifstream HtmlFile(html_file_path, std::ifstream::binary);
+	/* Read html file and returns its buffer */
+	std::ifstream HtmlFile(html_file_path, std::ifstream::binary);
 
-    if (!HtmlFile) {
-        std::cout << "Error: Can't read file" << std::endl;
-        exit (EXIT_FAILURE);
-    }
+	if (!HtmlFile) {
+		std::cout << "Error: Can't read file" << std::endl;
+		exit (EXIT_FAILURE);
+	}
 
-    // get length of file:
-    HtmlFile.seekg (0, HtmlFile.end);
-    int length = HtmlFile.tellg();
-    HtmlFile.seekg (0, HtmlFile.beg);
+	// get length of file:
+	HtmlFile.seekg (0, HtmlFile.end);
+	int length = HtmlFile.tellg();
+	HtmlFile.seekg (0, HtmlFile.beg);
 
-    char* buf = new char [length];
-    HtmlFile.read(buf, length);
+	char* buf = new char [length];
+	HtmlFile.read(buf, length);
 
-    // close file
-    HtmlFile.close();
+	// close file
+	HtmlFile.close();
 
-    return buf;
+	return buf;
 }
 
 int main() {
-    int server_fd, new_socket;
-    struct sockaddr_in address;
-    int opt = 1;
-    ssize_t send_status;
-    socklen_t addrlen = sizeof(address);
+	int server_fd, new_socket;
+	struct sockaddr_in address;
+	int opt = 1;
+	ssize_t send_status;
+	socklen_t addrlen = sizeof(address);
 
-    std::string response = "HTTP/1.1 200 OK\n\n";
+	std::string response = "HTTP/1.1 200 OK\n\n";
 
-    // Setup address
-    address = setup_address();
+	// Setup address
+	address = setup_address();
 
-    server_fd = socket(AF_INET, SOCK_STREAM, 0);
+	server_fd = socket(AF_INET, SOCK_STREAM, 0);
 
-    if (server_fd == -1) {
-        perror("socket failed");
-        exit(EXIT_FAILURE);
+	if (server_fd == -1) {
+		perror("socket failed");
+		exit(EXIT_FAILURE);
 
-    }
-    // Set the socket options
-    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1) {
-        perror("setsockopt");
-        exit(EXIT_FAILURE);
-    }
+	}
+	// Set the socket options
+	if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1) {
+		perror("setsockopt");
+		exit(EXIT_FAILURE);
+	}
 
-    // Bind address to the socket
-    if (bind(server_fd, (struct sockaddr*)&address, sizeof(address)) == -1) {
-        perror("bind failed");
-        exit(EXIT_FAILURE);
-    }
+	// Bind address to the socket
+	if (bind(server_fd, (struct sockaddr*)&address, sizeof(address)) == -1) {
+		perror("bind failed");
+		exit(EXIT_FAILURE);
+	}
 
-    // Listen for connections
-    if (listen(server_fd, 3) == -1) {
-        perror("listen");
-        exit(EXIT_FAILURE);
-    }
+	// Listen for connections
+	if (listen(server_fd, 3) == -1) {
+		perror("listen");
+		exit(EXIT_FAILURE);
+	}
 
-    std::string msg1 = "Server is running";
-    std::string msg2 = "-----------------";
-    std::cout << msg1 << std::endl;
-    std::cout << msg2 << std::endl;
+	std::string msg1 = "Server is running";
+	std::string msg2 = "-----------------";
+	std::cout << msg1 << std::endl;
+	std::cout << msg2 << std::endl;
 
-    while (true) {
-        // Accept for connections
-        new_socket = accept(server_fd, (struct sockaddr *)&address, &addrlen);
+	while (true) {
+		// Accept for connections
+		new_socket = accept(server_fd, (struct sockaddr *)&address, &addrlen);
 
-        if (new_socket == -1) {
+		if (new_socket == -1) {
 
-            perror("accept");
-            exit(EXIT_FAILURE);
-        }
+			perror("accept");
+			exit(EXIT_FAILURE);
+		}
 
-        int buf2[1024] = { 0 };
+		int buf2[1024] = { 0 };
 
-        // Read buffer of request
-        ssize_t read_status = read(new_socket, buf2, 1024);
+		// Read buffer of request
+		ssize_t read_status = read(new_socket, buf2, 1024);
 
-        if (read_status == -1) {
-            std::cout << "Reading the message failed \n" << std::endl;
-            return -1;
-        }
+		if (read_status == -1) {
+			std::cout << "Reading the message failed \n" << std::endl;
+			return -1;
+		}
 
-        char* temp2 = (char*)buf2;
+		char* temp2 = (char*)buf2;
 
-        std::string temp3 = (std::string)temp2;
+		std::string temp3 = (std::string)temp2;
 
-        char temp4[1024] = { 0 };
+		char temp4[1024] = { 0 };
 
-        for (long unsigned int i = 0; i < temp3.length(); i++) {
-            temp4[i] = temp3[i];
-        }
+		for (long unsigned int i = 0; i < temp3.length(); i++) {
+			temp4[i] = temp3[i];
+		}
 
-        char *line = strtok(temp4, "\n");
+		char *line = strtok(temp4, "\n");
 
-        std::string request = "";
+		std::string request = "";
 
-        while (line != NULL) {
-            request = (std::string)line;
-            line = strtok(NULL, "\n");
-            break;
-        }
+		while (line != NULL) {
+			request = (std::string)line;
+			line = strtok(NULL, "\n");
+			break;
+		}
 
 		std::string request_items[3];
 		int i = 0;
@@ -169,27 +169,27 @@ int main() {
 
 		std::cout << file_name << std::endl;
 
-        char* buf = (char*)"";
+		char* buf = (char*)"";
 
-        // read HTML file
+		// read HTML file
 		buf = read_html_file(file_name);
 
-        // Store HTML char pointer data
-        std::string temp = response + (std::string)buf;
-        const char* html = temp.c_str();
+		// Store HTML char pointer data
+		std::string temp = response + (std::string)buf;
+		const char* html = temp.c_str();
 
-        // Send the buffer of html web page
-        send_status = send(new_socket, html, strlen(html), 0);
+		// Send the buffer of html web page
+		send_status = send(new_socket, html, strlen(html), 0);
 
-        if (send_status == -1) {
-            std::cout << "Sending the message failed \n" << std::endl;
-            return -1;
-        }
-        else {
-            std::cout << (char*)buf2 << std::endl;
-        }
+		if (send_status == -1) {
+			std::cout << "Sending the message failed \n" << std::endl;
+			return -1;
+		}
+		else {
+			std::cout << (char*)buf2 << std::endl;
+		}
 
-        // close the socket
-        close(new_socket);
-    }
+		// close the socket
+		close(new_socket);
+	}
 }
