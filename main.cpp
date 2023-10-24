@@ -44,7 +44,7 @@ std::string find_requested_html_file(std::string file_route) {
 }
 
 char* read_html_file(std::string html_file_path) {
-    /* read html file */
+    /* Read html file and returns its buffer */
     std::ifstream HtmlFile(html_file_path, std::ifstream::binary);
 
     if (!HtmlFile) {
