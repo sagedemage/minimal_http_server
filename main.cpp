@@ -38,7 +38,6 @@ std::string find_requested_html_file(std::string file_route) {
         if (fs::is_directory(path, ec)) {
 			file_name = find_requested_html_file(file_route);
         }
-        //std::cout << entry.path() << std::endl;
     }
     return file_name;
 }
