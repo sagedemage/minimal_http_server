@@ -25,6 +25,7 @@ static struct sockaddr_in setup_address() {
 }
 
 std::string find_requested_html_file(std::string file_route) {
+	/* Recursively look through the directory to find the requested html file */
 	std::string file_name = "static/404.html";
     std::string path_route = "static";
     for (const auto & entry : fs::directory_iterator(path_route)) {
