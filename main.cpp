@@ -32,8 +32,6 @@ std::string find_requested_html_file(std::string file_route, std::string path_ro
 		fs::path path(entry);
 		std::error_code ec;
 		std::string path_string = path.string();
-		std::cout << "Route: " << file_route << std::endl;
-		std::cout << "Path: " << path_string << std::endl;
 		if (file_route.compare(path_string) == 0) {
 			file_name = file_route;
 			return file_name;
