@@ -39,6 +39,10 @@ std::string find_requested_html_file(std::string file_route) {
 		if (fs::is_directory(path, ec)) {
 			file_name = find_requested_html_file(file_route);
 		}
+		else if (ec)
+		{
+			std::cerr << "Error in is_directory: " << ec.message();
+		}
 	}
 	return file_name;
 }
@@ -67,18 +71,14 @@ char* read_html_file(std::string html_file_path) {
 }
 
 int main() {
-	int server_fd, new_socket;
-	struct sockaddr_in address;
 	int opt = 1;
-	ssize_t send_status;
-	socklen_t addrlen = sizeof(address);
 
-	std::string response = "HTTP/1.1 200 OK\n\n";
 
 	// Setup address
-	address = setup_address();
+	struct sockaddr_in address = setup_address();
+	socklen_t addrlen = sizeof(address);
 
-	server_fd = socket(AF_INET, SOCK_STREAM, 0);
+	int server_fd = socket(AF_INET, SOCK_STREAM, 0);
 
 	if (server_fd == -1) {
 		perror("socket failed");
@@ -103,32 +103,29 @@ int main() {
 		exit(EXIT_FAILURE);
 	}
 
-	std::string msg1 = "Server is running";
-	std::string msg2 = "-----------------";
-	std::cout << msg1 << std::endl;
-	std::cout << msg2 << std::endl;
+	std::cout << "Server is running" << std::endl;
+	std::cout << "-----------------" << std::endl;
 
 	while (true) {
 		// Accept for connections
-		new_socket = accept(server_fd, (struct sockaddr *)&address, &addrlen);
+		int new_socket = accept(server_fd, (struct sockaddr *)&address, &addrlen);
 
 		if (new_socket == -1) {
-
 			perror("accept");
 			exit(EXIT_FAILURE);
 		}
 
-		int buf2[1024] = { 0 };
+		int read_buf[1024] = { 0 };
 
 		// Read buffer of request
-		ssize_t read_status = read(new_socket, buf2, 1024);
+		ssize_t read_status = read(new_socket, read_buf, 1024);
 
 		if (read_status == -1) {
 			std::cout << "Reading the message failed \n" << std::endl;
 			return -1;
 		}
 
-		char* temp2 = (char*)buf2;
+		char* temp2 = (char*)read_buf;
 
 		std::string temp3 = (std::string)temp2;
 
@@ -160,33 +157,37 @@ int main() {
 		std::string file_route = request_items[1];
 		file_route = "static" + file_route;
 		char file_route_last_char = file_route[file_route.length() -1];
-		if (file_route_last_char == '/') {
+		// .html
+		// string r = s1.substr(3, 2);
+		std::string html_extension = file_route.substr(file_route.length()-5, -1);
+		if (html_extension != ".html") {
+			// /about
+			file_route += "/index.html";
+		}
+		else if (file_route_last_char == '/') {
 			file_route += "index.html";
 		}
 
 		// find if requested file exists in web server
 		std::string file_name = find_requested_html_file(file_route);
 
-		std::cout << file_name << std::endl;
-
-		char* buf = (char*)"";
-
 		// read HTML file
-		buf = read_html_file(file_name);
+		char* buf = read_html_file(file_name);
 
 		// Store HTML char pointer data
+		std::string response = "HTTP/1.1 200 OK\n\n";
 		std::string temp = response + (std::string)buf;
 		const char* html = temp.c_str();
 
 		// Send the buffer of html web page
-		send_status = send(new_socket, html, strlen(html), 0);
+		ssize_t send_status = send(new_socket, html, strlen(html), 0);
 
 		if (send_status == -1) {
 			std::cout << "Sending the message failed \n" << std::endl;
 			return -1;
 		}
 		else {
-			std::cout << (char*)buf2 << std::endl;
+			std::cout << (char*)read_buf << std::endl;
 		}
 
 		// close the socket
