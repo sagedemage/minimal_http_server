@@ -155,16 +155,14 @@ int main() {
 		std::string file_route = request_items[1];
 		file_route = "static" + file_route;
 		char file_route_last_char = file_route[file_route.length() -1];
-		// .ico
+		// file with .ico file extension
 		std::string ico_extension = file_route.substr(file_route.length()-4, -1);
-		// .html
-		// string r = s1.substr(3, 2);
+		// file with .html file extension
 		std::string html_extension = file_route.substr(file_route.length()-5, -1);
 		if (file_route_last_char == '/') {
 			file_route += "index.html";
 		}
 		else if (html_extension != ".html" && ico_extension != ".ico") {
-			// /about
 			file_route += "/index.html";
 		}
 		
