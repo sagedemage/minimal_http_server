@@ -52,7 +52,7 @@ char* read_html_file(std::string html_file_path) {
 	std::ifstream HtmlFile(html_file_path, std::ifstream::binary);
 
 	if (!HtmlFile) {
-		std::cout << "Error: Can't read file" << std::endl;
+		std::cout << "Error: Can't read file: " + html_file_path << std::endl;
 		exit (EXIT_FAILURE);
 	}
 
@@ -157,10 +157,12 @@ int main() {
 		std::string file_route = request_items[1];
 		file_route = "static" + file_route;
 		char file_route_last_char = file_route[file_route.length() -1];
+		// .ico
+		std::string ico_extension = file_route.substr(file_route.length()-4, -1);
 		// .html
 		// string r = s1.substr(3, 2);
 		std::string html_extension = file_route.substr(file_route.length()-5, -1);
-		if (html_extension != ".html") {
+		if (html_extension != ".html" && ico_extension != ".ico") {
 			// /about
 			file_route += "/index.html";
 		}
