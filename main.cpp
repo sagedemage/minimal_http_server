@@ -24,10 +24,10 @@ static struct sockaddr_in setup_address() {
 	return address;
 }
 
-std::string find_requested_html_file(std::string file_route) {
+std::string find_requested_html_file(std::string file_route, std::string path_route) {
 	/* Recursively look through the directory to find the requested html file */
 	std::string file_name = "static/404.html";
-	std::string path_route = "static";
+	//std::string path_route = "static";
 	for (const auto & entry : fs::directory_iterator(path_route)) {
 		fs::path path(entry);
 		std::error_code ec;
@@ -38,8 +38,8 @@ std::string find_requested_html_file(std::string file_route) {
 			file_name = file_route;
 			return file_name;
 		}
-		if (fs::is_directory(path, ec)) {
-			file_name = find_requested_html_file(file_route);
+		else if (fs::is_directory(path, ec)) {
+			file_name = find_requested_html_file(file_route, path_string);
 		}
 		else if (ec)
 		{
@@ -173,7 +173,7 @@ int main() {
 		
 
 		// find if requested file exists in web server
-		std::string file_name = find_requested_html_file(file_route);
+		std::string file_name = find_requested_html_file(file_route, "static");
 
 		// read HTML file
 		char* buf = read_html_file(file_name);
