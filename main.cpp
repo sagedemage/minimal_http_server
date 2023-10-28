@@ -73,7 +73,6 @@ char* read_html_file(std::string html_file_path) {
 int main() {
 	int opt = 1;
 
-
 	// Setup address
 	struct sockaddr_in address = setup_address();
 	socklen_t addrlen = sizeof(address);
