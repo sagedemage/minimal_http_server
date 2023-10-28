@@ -35,7 +35,7 @@ std::string find_requested_html_file(std::string file_route, std::string path_ro
 			file_name = file_route;
 			return file_name;
 		}
-		else if (fs::is_directory(path, ec)) {
+		if (fs::is_directory(path, ec)) {
 			file_name = find_requested_html_file(file_route, path_string);
 		}
 		else if (ec)
