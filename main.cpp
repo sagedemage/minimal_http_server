@@ -32,7 +32,9 @@ std::string find_requested_html_file(std::string file_route) {
 		fs::path path(entry);
 		std::error_code ec;
 		std::string path_string = path.string();
-		if (file_route.compare(path_string)) {
+		std::cout << "Route: " << file_route << std::endl;
+		std::cout << "Path: " << path_string << std::endl;
+		if (file_route.compare(path_string) == 0) {
 			file_name = file_route;
 			return file_name;
 		}
@@ -161,13 +163,14 @@ int main() {
 		// .html
 		// string r = s1.substr(3, 2);
 		std::string html_extension = file_route.substr(file_route.length()-5, -1);
-		if (html_extension != ".html" && ico_extension != ".ico") {
+		if (file_route_last_char == '/') {
+			file_route += "index.html";
+		}
+		else if (html_extension != ".html" && ico_extension != ".ico") {
 			// /about
 			file_route += "/index.html";
 		}
-		else if (file_route_last_char == '/') {
-			file_route += "index.html";
-		}
+		
 
 		// find if requested file exists in web server
 		std::string file_name = find_requested_html_file(file_route);
